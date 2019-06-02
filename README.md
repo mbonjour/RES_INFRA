@@ -30,9 +30,11 @@ I've set an entrypoint for the app as *node /opt/app/index.js* as we can pass ar
 
 ## Demo
 For the demo just go to docker-images/express-image and run
+
 > docker build -t res/express-students .
+
 > docker run -d -p 9091:3000 res/express-students
-## COnfig files
+## Config files
 I haven't touched any of the config files for this exercise
 # Step 3 - Reverse Proxy wit apache (static conf)
 ## Dockerfile explained
@@ -57,4 +59,26 @@ Static configuration, we have mapped the static http to 172.17.0.2 (demo.res.ch:
 ## Answers
 We can't access to the static or dynamic HTTP server directly because it's in the Docker infra and there aren't port mapping done.
 The static configuration is weak because it's based on the IP of the containers and this IP is volatile in the docker infrastructure.
+# Step 4 - AJAX requests with JQuery
+## Dockerfile explained
+I'v added as the webcasts suggested the vim package to all images for the tests.
+## Demo
+Iy you want to have a working demo for this step we need to do exactly as the step 3 but before we need to do a fesh start. For this we need to remove all containers and stop them all.
+After that you need to rebuild the three images :
+In docker-images/apache-php-image/
+> docker build -t res/apache-php .
 
+In docker-images/express-image
+> docker build -t res/express-beer
+
+In docker-images/apache-reverse-proxy
+> docker build -t res/reverse-proxy
+
+When we have build all the images we need to start them all using exactly this order :
+> docker run -d --name apace-static res/apache-php
+
+> docker run -d --name express-beer res/express-beer
+
+> docker run -d -p 8080:80 --name apache-rp res/reverse-proxy
+
+Iy you have a good /etc/hosts file (c.f. step 3) you can now go on demo.res.ch:8080 and ENjoy...
