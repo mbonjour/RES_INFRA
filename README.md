@@ -53,3 +53,8 @@ After that we can build our image for the reverse :
 To test the reverse you need to change your /etc/hosts (or any equivalent) and map 127.0.0.1 to demo.res.ch (for native users) or the IP of the docker-machine for others.
 ## Config files
 Static configuration, we have mapped the static http to 172.17.0.2 (demo.res.ch:8080) and the API toward 172.17.0.3 (demo.res.ch/api/beer).
+
+## Answers
+We can't access to the static or dynamic HTTP server directly because it's in the Docker infra and there aren't port mapping done.
+The static configuration is weak because it's based on the IP of the containers and this IP is volatile in the docker infrastructure.
+
