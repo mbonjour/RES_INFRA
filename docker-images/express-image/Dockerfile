@@ -1,4 +1,4 @@
-FROM node:4.4
+FROM node:8.16
 
 RUN apt-get update && apt-get install -y vim
 
