@@ -81,4 +81,26 @@ When we have build all the images we need to start them all using exactly this o
 
 > docker run -d -p 8080:80 --name apache-rp res/reverse-proxy
 
-Iy you have a good /etc/hosts file (c.f. step 3) you can now go on demo.res.ch:8080 and ENjoy...
+If you have a good /etc/hosts file (c.f. step 3) you can now go on demo.res.ch:8080 and Enjoy...
+# Setp 5 - Dynamic reverse proxy configuration
+## Dockerfile explained
+I've just added som COPY to dockerfiles to add the template file of the reverse proxy and the setup script for the apache image *apache2-foreground*.
+## Demo
+For the demo you hust need to run a static container and one dynamic from the previous steps.
+
+> docker run -d res/apache-static
+
+> docker run -d res/express-students
+
+And the recup their ipaddress with :
+
+> docker inspect name_of_the_container | grep -i ipaddress
+
+When you have the ip addresses of both of the containers you can launch the dynamic reverse proxy by first building it in docker-images/apache-reverse-proxy :
+
+> docker build -t res/reverse-proxy .
+
+> docker run -d -p 8080:80 -e STATIC_APP=ip_address_of_sttic container -e DYNAMIC_APP=ip_address_of_dynamic_container res/reverse_proxy
+
+## Config
+I've added to the base apache2-foreground an *php config-template.php > /etc/apache2/sites-available/001-reverse.conf* to generate dynamically the configuration of the proxy from the environment variables *STATIC_APP* and *DYNAMIC_APP*.
