@@ -1,16 +1,34 @@
 <?php
-	$ip_static = getenv('STATIC_APP');
-	$ip_dynamic = getenv('DYNAMIC_APP');
+	$ip_static = explode(";", getenv('STATIC_APP'));
+	$ip_dynamic = explode(";", getenv('DYNAMIC_APP'));
 ?>
 
 <VirtualHost *:80>
+	
+	<Proxy balancer://clusterStatic>
+		<?php 
+			foreach ($ip_static as $static) {
+				print "BalancerMember http://" . $static . "\n\t\t";
+			}
+		?>
+	</Proxy>
+	<Proxy balancer://clusterDynamic>
+		<?php
+			foreach ($ip_dynamic as $dynamic) {
+				print "BalancerMember http://" . $dynamic . "\n\t\t";
+			}
+		?>
+	</Proxy>
+
+	ProxyPreserveHost On
+
 	ServerName demo.res.ch
 
-	ProxyPass "/api/beer" "http://<?php print "$ip_dynamic" ?>/"
-	ProxyPassReverse "/api/beer" "http://<?php print "$ip_dynamic"  ?>/"
+	ProxyPass "/api/beer" balancer://clusterDynamic/
+	ProxyPassReverse "/api/beer" balancer://clusterDynamic/
 
-	ProxyPass "/" "http://<?php print "$ip_static"  ?>/"
-	ProxyPassReverse "/" "http://<?php print "$ip_static"  ?>/"
+	ProxyPass "/" balancer://clusterStatic/
+	ProxyPassReverse "/" balancer://clusterStatic/
 
 </VirtualHost>
 
