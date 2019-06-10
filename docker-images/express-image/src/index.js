@@ -2,7 +2,7 @@ var express = require('express')
 var axios = require('axios')
 var Chance = require('chance')
 var chance = new Chance()
-
+var ip = require('ip')
 var app = express()
 
 app.get('/test', (req, res) => {
@@ -16,7 +16,9 @@ app.get('/', (req, res) =>{
 	})
 
 	axios.get('https://api.punkapi.com/v2/beers').then((res2)=>{
-		res.send(res2.data[randomID])
+		obj = res2.data[randomID]
+		obj.ip = ip.address()
+		res.send(obj)
 	})
 })
 

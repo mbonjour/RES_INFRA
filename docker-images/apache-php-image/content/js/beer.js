@@ -9,7 +9,7 @@ $(function() {
 			});
 		 	var message = "No beer loaded";
 			
-			message = beer.name + ", first brewed : " + beer.first_brewed;	
+			message = beer.name + ", first brewed : " + beer.first_brewed + " served by " + beer.ip;	
 			
 			$(".test").text(message);
 		});
