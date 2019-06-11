@@ -3,12 +3,8 @@
 
 HTTP infrastructure laboratory
 
-# Structure
-docker-images/
-		apache-php-images/
-				Dockerfile
-				content/
-						staticSite
+# Infos globales
+Les ports choisis pour notre implémentation avec express est 3000 (interne au docker) quant aux serveurs statiques nous avons laissés de base 80 pour apache. Pareil pour le reverse proxy.
 
 # Step 1 - Static HTTP server with apache httpd
 ## Dockerfile explained
@@ -104,3 +100,21 @@ When you have the ip addresses of both of the containers you can launch the dyna
 
 ## Config
 I've added to the base apache2-foreground an *php config-template.php > /etc/apache2/sites-available/001-reverse.conf* to generate dynamically the configuration of the proxy from the environment variables *STATIC_APP* and *DYNAMIC_APP*.
+
+# Step 6 - Load Balancing : multiple server nodes
+## Dockerfile explained
+We juste added in the apache-reverse-proxy dockerfile some RUN commands to enable the balancing modules. In fact that's all we had to add for the implementation to work.
+## Demo
+You need to build the 3 docker images (c.f. Demo chapter 4) ans then run some static php images and some dynamic express images.
+Afetr you did that you need to know the IP addresses of the containers Dynamic and the static ones. When you do you have to run the proxy somewhat like that :
+
+docker run -d -p 8080:80 -e DYNMAIC_APP=ip_address1:portNR\;ip_address2:portNR\;ip_adress3:portNR -e STATIC_APP=ip_address4:portNR\;ip_address5:portNR\;ip_address6:portNR res/reverse-proxy
+
+After that you can go to demo.res.ch:8080 and see if it works. For time reasons we havn't implemented the verification of the static balancing verification but for the dynamic one yes. In fact if you launch some instances of the website you can see that de dynamic is served by multiple servers.
+
+## Config
+For the configuration we have essentially based our config from a website which is https://linuxtechlab.com/use-apache-reverse-proxy-as-load-balancer/ and we haven't done much more in fact. But well it works. It's simple we modified the template to create 2 LoadBalancer, one for the static webistes passed as Env vars and one for the dynamic ones.
+
+We modified the config of the dynamic and the static pages to add the ip address of the server who sent the information to see that it isn't always the same one. So we an see by who the dynamic information is served, But for the static one we didn't had teh time to do the same.
+
+
